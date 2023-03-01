@@ -1,31 +1,18 @@
-import discord
 import os
+import logging
 
 from dotenv import load_dotenv
 
+from config import log_mod
+from events import client
+
 load_dotenv()
 
-token = os.getenv("ID_TOKEN")
-print(token)
+try:
+    handler = logging.FileHandler(filename='logs/discord.log', encoding='utf-8', mode='w')
+except FileNotFoundError:
+    os.mkdir("logs")
 
-intents = discord.Intents.default()
-intents.message_content = True
-
-client = discord.Client(intents=intents)
-
-
-@client.event
-async def on_ready():
-    print(f'We have logged in as {client.user}')
-
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-
-    if message.content.startswith('$hello'):
-        await message.channel.send('Hello!')
-
-
-client.run(token)
+if __name__ == "__main__":
+    token = os.getenv("ID_TOKEN")
+    client.run(token, log_handler=handler if log_mod else None)
